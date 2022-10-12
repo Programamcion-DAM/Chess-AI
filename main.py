@@ -108,17 +108,22 @@ def Find_Node(pos, WIDTH):
     return pos
 
 def machine_move(boardCopy):
+    max = -99999
+    movement = ""
     legal_moves = [str(mov) for mov in board.legal_moves]
-    movement = legal_moves[random.randint(0,len(legal_moves)-1)]
+    for move in legal_moves:
+        value = evaluateBoard(boardCopy.copy(),move)
+        if value > max:
+            movement = move
+            max = value    
     return movement
 
-#Esto ahoro no hace es el segundo paso
 def evaluateBoard(boardCopy,movement):
     value = 0
     boardCopy.push(chess.Move.from_uci(movement))
     for i in range(8):
         for j in range(8):
-            piece = str(board.piece_at(chess.Square((i*8+j))))
+            piece = str(boardCopy.piece_at(chess.Square((i*8+j))))
             value += getValueOfPiece(piece)
     return value
 
