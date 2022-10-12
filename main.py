@@ -110,13 +110,14 @@ def Find_Node(pos, WIDTH):
 def machine_move(boardCopy):
     max = -99999
     movement = ""
-    legal_moves = [str(mov) for mov in board.legal_moves]
+    legal_moves = [str(mov) for mov in boardCopy.legal_moves]
     for move in legal_moves:
-        value = evaluateBoard(boardCopy.copy(),move)
-        if value > max:
+        result = minMaxMin(boardCopy.copy(),move,1)
+        if result["Value"] > max:
             movement = move
-            max = value    
+            max = result["Value"]    
     return movement
+
 
 def evaluateBoard(boardCopy,movement):
     value = 0
@@ -155,6 +156,38 @@ def getValueOfPiece(letter):
             return -10
 
         return 0
+
+def minMaxMax(boardCopy,movement,depth):
+    if depth < 0:
+        value = evaluateBoard(boardCopy,movement)
+        return {"Value":value,"Movement":movement}
+    
+    boardCopy.push(chess.Move.from_uci(movement))
+    max = -99999
+    legal_moves = [str(mov) for mov in boardCopy.legal_moves]
+    result = {}
+    for move in legal_moves:
+       evaluation = minMaxMin(boardCopy.copy(),move,depth-1)
+       if  evaluation["Value"] > max:
+            max = evaluation["Value"]
+            result = evaluation
+    return result
+
+def minMaxMin(boardCopy,movement,depth):
+    if depth < 0:
+        value = evaluateBoard(boardCopy,movement)
+        return {"Value":value,"Movement":movement}
+    
+    boardCopy.push(chess.Move.from_uci(movement))
+    min = 99999
+    legal_moves = [str(mov) for mov in boardCopy.legal_moves]
+    result = {}
+    for move in legal_moves:
+       evaluation = minMaxMax(boardCopy.copy(),move,depth-1)
+       if  evaluation["Value"] < min:
+            min = evaluation["Value"]
+            result = evaluation
+    return result
 
 def main(WIN, WIDTH):
     movement = ""
