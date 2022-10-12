@@ -112,12 +112,35 @@ def machine_move(boardCopy):
     movement = ""
     legal_moves = [str(mov) for mov in boardCopy.legal_moves]
     for move in legal_moves:
-        result = minMaxMin(boardCopy.copy(),move,1)
-        if result["Value"] > max:
+        result = alphabeta_pruning(boardCopy.copy(),move,3,-999999,9999999,False)
+        if result > max:
             movement = move
-            max = result["Value"]    
+            max = result   
     return movement
 
+def alphabeta_pruning(boardCopy,movement,depth,alpha,beta,maximizingPlayer):
+    if depth == 0:
+        return evaluateBoard(boardCopy,movement)
+    
+    boardCopy.push(chess.Move.from_uci(movement))
+    legal_moves = [str(mov) for mov in boardCopy.legal_moves]
+
+    if maximizingPlayer:
+        value = -999999
+        for move in legal_moves:
+            value = max(value,alphabeta_pruning(boardCopy.copy(),move,depth-1,alpha,beta,False))
+            if value >= beta:
+                break
+            alpha = max(alpha,value)
+        return value
+    else:
+        value = 999999
+        for move in legal_moves:
+            value = min(value,alphabeta_pruning(boardCopy.copy(),move,depth-1,alpha,beta,True))
+            if value <= alpha:
+                break
+            beta = min(beta,value)
+        return value
 
 def evaluateBoard(boardCopy,movement):
     value = 0
